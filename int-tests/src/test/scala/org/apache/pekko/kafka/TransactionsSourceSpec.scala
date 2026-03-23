@@ -84,7 +84,6 @@ class TransactionsSourceSpec
       val consumerSettings = consumerDefaults.withGroupId(group).withStopTimeout(0.seconds)
 
       val completedCopy = new AtomicInteger(0)
-      val completedWithTimeout = new AtomicInteger(0)
 
       def runStream(id: String): UniqueKillSwitch =
         RestartSource
@@ -99,11 +98,8 @@ class TransactionsSourceSpec
               Some(restartAfter),
               Some(maxRestarts))
               .recover {
-                case e: TimeoutException =>
-                  if (completedWithTimeout.incrementAndGet() > 10)
-                    "no more messages to copy"
-                  else
-                    throw new Error("Continue restarting copy stream")
+                case _: TimeoutException =>
+                  throw new Error("Continue restarting copy stream")
               }
           })
           .viaMat(KillSwitches.single)(Keep.right)
