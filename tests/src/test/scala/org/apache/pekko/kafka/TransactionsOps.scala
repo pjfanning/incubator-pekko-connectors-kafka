@@ -104,7 +104,7 @@ trait TransactionsOps extends TestSuite with Matchers {
 
   def restart(count: Int, restartAfter: Option[Int], maxRestarts: Option[AtomicInteger]): Boolean = {
     (restartAfter, maxRestarts) match {
-      case (Some(restart), Some(maxRestart)) => count >= restart && maxRestart.decrementAndGet() > 0
+      case (Some(restart), Some(maxRestart)) => count >= restart && maxRestart.decrementAndGet() >= 0
       case (Some(restart), _)                => count >= restart
       case _                                 => false
     }
